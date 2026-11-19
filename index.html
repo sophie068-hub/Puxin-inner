@@ -351,6 +351,7 @@
   </style>
 <style>.deck-entry{width:100%;font:inherit;color:inherit;text-align:left}.deck-entry .menu-desc{display:block}.card h2{font-size:1.2rem}.card label{display:block;margin:.75rem 0 .3rem}.deck-art{display:block;width:min(100%,350px);margin:0 auto 18px;border-radius:12px}.reading dt{font-weight:650;margin-top:14px}.reading dd{margin:4px 0;white-space:pre-line}.nav-item{min-width:0;flex:1}.nav-item:focus-visible,.menu-item:focus-visible{outline:2px solid #775b46}</style><style>div:empty + .invite-friend{display:none}</style>
 <style>.oracle-deck{width:100%;font:inherit;color:inherit}.oracle-deck:focus-visible{outline:3px solid #775b46;outline-offset:3px}.companion-art-link{display:block;margin:0 auto 18px;max-width:350px}.companion-art{height:auto;object-fit:contain;margin-bottom:0}.companion-copy{font-size:14.5px;line-height:1.85}.companion-copy dd{margin:5px 0 16px;overflow-wrap:anywhere}.deck-count{font-size:13px;color:var(--text-secondary);margin:8px 0 0}.companion-reading>.btn-outline{margin-top:18px;width:100%}.companion-image-note{font-size:14px;line-height:1.7;color:var(--text-secondary)}</style>
+  <link rel="stylesheet" href="assets/jiaobei/jiaobei.css">
 </head>
 <body>
 
@@ -389,6 +390,8 @@
       </div>
       <div class="menu-arrow">→</div>
     </div>
+
+    <button type="button" class="menu-item deck-entry" onclick="switchPage('jiaobei')"><span class="stamp-icon">筊</span><span class="menu-info"><strong>線上擲筊</strong><span class="menu-desc">抽卡後擲筊，或擲筊後接著抽觀音卡</span></span></button>
 
     <div class="menu-item" onclick="switchPage('child')">
       <div class="stamp-icon" style="border-color: var(--accent-rose); color: var(--accent-rose);">癒</div>
@@ -455,7 +458,65 @@
       <span style="display:block;font-size:16px;font-weight:600">抽一張觀音神諭卡</span>
       <span style="display:block;font-size:12.5px;color:var(--text-secondary);margin-top:6px">讀取完整慈悲指引、行動建議與靜心祈願語</span>
     </button>
+    <div id="guanyin-jiaobei-summary" class="card" hidden aria-label="本次擲筊紀錄"><strong id="guanyin-jiaobei-label"></strong><p id="guanyin-jiaobei-question" hidden></p><button class="btn-outline" type="button" id="guanyin-view-jiaobei">回看本次擲筊結果</button></div>
     <div id="guanyin-result" aria-live="polite"></div><button class="btn-outline invite-friend" onclick="shareApp()">邀請朋友也抽一張牌</button>
+  </div>
+
+  <div id="page-jiaobei" class="page">
+    <div id="puxin-jiaobei">
+    <header>
+      <p class="eyebrow">給心一點安靜的時間</p>
+      <h1>線上擲筊</h1>
+      <p class="intro">深呼吸，把心裡的事整理成一個清楚的問題。</p>
+    </header>
+      <div class="stage" id="stage" role="img" aria-label="一對紅色筊杯，尚未擲筊">
+        <div class="blocks">
+          <div class="block-wrap">
+            <span class="block" data-face="flat" aria-hidden="true"><span class="flat-face"></span><span class="round-face"></span></span>
+            <p class="face-label" id="face-a">筊杯</p>
+          </div>
+          <div class="block-wrap">
+            <span class="block" data-face="round" aria-hidden="true"><span class="flat-face"></span><span class="round-face"></span></span>
+            <p class="face-label" id="face-b">筊杯</p>
+          </div>
+        </div>
+      </div>
+    <section class="card" aria-label="擲筊體驗">
+      <div class="jiaobei-card-context" id="jiaobei-card-context" hidden>
+        <p class="privacy" id="jiaobei-card-context-label">本次觀音卡</p><strong id="jiaobei-card-title"></strong>
+        <p class="privacy" id="jiaobei-card-prompt">可以針對這張卡的提醒，整理成一個想請示的問題。</p>
+        <button class="btn-outline" id="jiaobei-view-card" type="button">回看這張觀音卡</button>
+      </div>
+      <label class="question-label" for="question">此刻想問的事 <span class="optional">（也可以在心裡默念）</span></label>
+      <textarea id="question" maxlength="300" placeholder="例：我是否準備好，和對方好好談一談？" aria-describedby="question-privacy"></textarea>
+      <p class="privacy" id="question-privacy">輸入的問題不會上傳，頁面不會儲存。</p>
+      <div class="prayer" aria-labelledby="prayer-title">
+        <p class="prayer-title" id="prayer-title">擲筊前，先慢慢默念</p>
+        <p>我願先讓心安靜下來，帶著誠意，<br>請觀音菩薩慈悲指引。</p>
+        <p>我想請示的是：<br><span class="prayer-question" id="prayer-question">在心裡說清楚，最想請示的一件事。</span></p>
+        <p>願我看清此刻，也保有自己的判斷。</p>
+        <p class="prayer-hint">默念後，深呼吸三次，再輕輕擲筊。</p>
+      </div>
+      <p class="status" id="status" role="status" aria-live="polite" aria-atomic="true">準備好後，輕按下方按鈕。</p>
+      <button class="btn-primary" id="cast" type="button">靜心，擲筊</button>
+      <section class="result" id="result" hidden aria-labelledby="result-title">
+        <h2 class="result-title" id="result-title"></h2>
+        <p class="result-faces" id="result-faces"></p>
+        <p class="result-meaning" id="result-meaning"></p>
+        <p class="result-reflection" id="result-reflection"></p>
+      </section>
+      <button class="btn-primary" id="jiaobei-draw-guanyin" type="button" hidden>接著抽一張觀音卡</button>
+      <button class="btn-outline" id="reset" type="button" hidden>整理心情，換個問題</button>
+    </section>
+    <details>
+      <summary>認識三種筊象</summary>
+      <dl class="guide"><dt>聖筊</dt><dd>一平一凸，傳統解讀為同意。</dd><dt>笑筊</dt><dd>兩個平面朝上，傳統解讀為尚未明確答覆。</dd><dt>陰筊</dt><dd>兩個凸面朝上，傳統解讀為不同意。</dd></dl>
+      <p>筊象說明參考<a href="https://sunfong.org.tw/?act=menuinfo&amp;ml_id=20220720011" target="_blank" rel="noopener noreferrer">高雄三鳳宮</a>；各宮廟的請示方式可能不同。</p>
+    </details>
+    <p class="note">這是以電腦隨機呈現筊象的線上體驗，供靜心與自我覺察參考。結果不代表神明實際指示。</p>
+    <p class="footer">留一點空間，聽見自己的心。</p>
+  
+    </div>
   </div>
 
   <!-- ==================== 4. 內在小孩療癒卡 ==================== -->
@@ -641,7 +702,8 @@
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('page-' + pageId).classList.add('active');
-    document.getElementById('nav-' + pageId).classList.add('active');
+    const activeNav = document.getElementById('nav-' + pageId) || (pageId === 'jiaobei' ? document.getElementById('nav-guanyin') : null);
+    if (activeNav) activeNav.classList.add('active');
     window.scrollTo(0, 0);
     if (pageId === 'tarot' && document.getElementById('tarot-board').innerHTML.trim() === '') {
       initTarot();
@@ -983,8 +1045,19 @@
     again.className = 'btn-outline';
     again.textContent = '再抽一張';
     again.onclick = kind === 'child' ? drawInnerChild : drawGuanyin;
-    box.append(tags, imageLink, title, list, again);
+    box.append(tags, imageLink, title, list);
+    if (kind === 'guanyin' && typeof window !== 'undefined' && window.PuxinJiaobeiFlow) {
+      const castLink = document.createElement('button');
+      castLink.type = 'button';
+      castLink.className = 'btn-primary';
+      castLink.dataset.jiaobeiCardId = card.id;
+      castLink.textContent = '接著擲筊';
+      castLink.onclick = () => window.PuxinJiaobeiFlow.openForCard(card);
+      box.append(castLink);
+    }
+    box.append(again);
     target.replaceChildren(box);
+    if (kind === 'guanyin' && typeof window !== 'undefined' && window.PuxinJiaobeiFlow) window.PuxinJiaobeiFlow.noteCard(card);
   }
 
   function drawGuanyin() {
@@ -1086,5 +1159,7 @@ document.querySelectorAll('div.menu-item,div.nav-item').forEach(el=>{
 });
 
 </script>
+<script src="assets/jiaobei/jiaobei.js"></script>
+<script src="assets/jiaobei/flow.js"></script>
 </body>
 </html>
