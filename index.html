@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>璞心｜Puxin Inner · 線上心靈指引</title>
+  <title>「璞心｜Puxin Inner」心靈指引站</title>
   <!-- 引入開源專業紫微斗數排盤引擎 iztro -->
   <script async src="https://cdn.jsdelivr.net/npm/iztro@2.6.0/dist/iztro-v2.6.0.min.js"></script>
   <style>
@@ -348,7 +348,8 @@
       border-color: var(--accent-dark);
     }
   </style>
-<style>.deck-entry{width:100%;font:inherit;color:inherit;text-align:left}.deck-entry .menu-desc{display:block}.card h2{font-size:1.2rem}.card label{display:block;margin:.75rem 0 .3rem}.deck-art{display:block;width:min(100%,350px);margin:0 auto 18px;border-radius:12px}.reading dt{font-weight:650;margin-top:14px}.reading dd{margin:4px 0;white-space:pre-line}.nav-item{min-width:0;flex:1}.nav-item:focus-visible,.menu-item:focus-visible{outline:2px solid #775b46}</style></head>
+<style>.deck-entry{width:100%;font:inherit;color:inherit;text-align:left}.deck-entry .menu-desc{display:block}.card h2{font-size:1.2rem}.card label{display:block;margin:.75rem 0 .3rem}.deck-art{display:block;width:min(100%,350px);margin:0 auto 18px;border-radius:12px}.reading dt{font-weight:650;margin-top:14px}.reading dd{margin:4px 0;white-space:pre-line}.nav-item{min-width:0;flex:1}.nav-item:focus-visible,.menu-item:focus-visible{outline:2px solid #775b46}</style><style>div:empty + .invite-friend{display:none}</style>
+</head>
 <body>
 
 <div class="container">
@@ -356,7 +357,7 @@
   <!-- ==================== 1. 首頁大廳 ==================== -->
   <div id="page-home" class="page active">
     <div class="header">
-      <h1>璞心｜Puxin Inner</h1>
+      <h1>「璞心｜Puxin Inner」心靈指引站</h1>
       <p>紫微 · 八字 · 七脈輪 · 慈悲神諭 · 內在小孩 · 塔羅</p>
     </div>
 
@@ -419,7 +420,7 @@
 
     <div class="cta-box">
       <p>想預約一對一深度催眠、臼井靈氣療癒或流年命盤解析？</p>
-      <button class="btn-outline" style="background: #fff; margin-top: 0;" onclick="shareApp()">分享「璞心」指引工作台給好友</button>
+      <a class="btn-primary" style="display:block;box-sizing:border-box;text-decoration:none;text-align:center" href="https://lin.ee/q1uvACj" target="_blank" rel="noopener noreferrer">到 LINE 詢問一對一服務</a>
     </div>
   </div>
 
@@ -441,7 +442,7 @@
       <div style="text-align: center; font-size: 12px; color: var(--text-secondary);">點擊上方牌背，依序翻開你的訊息</div>
     </div>
 
-    <div id="tarot-readings"></div>
+    <div id="tarot-readings"></div><button class="btn-outline invite-friend" onclick="shareApp()">邀請朋友也抽一張牌</button>
   </div>
 
   <!-- ==================== 3. 慈悲靈性指引卡 ==================== -->
@@ -457,7 +458,7 @@
       <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 6px;">閉上眼睛深呼吸，想著你最需要被照亮的事</div>
     </div>
 
-    <div id="guanyin-result"></div>
+    <div id="guanyin-result"></div><button class="btn-outline invite-friend" onclick="shareApp()">邀請朋友也抽一張牌</button>
   </div>
 
   <!-- ==================== 4. 內在小孩療癒卡 ==================== -->
@@ -473,7 +474,7 @@
       <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 6px;">把手放在胸口，感受此刻的情緒流動</div>
     </div>
 
-    <div id="child-result"></div>
+    <div id="child-result"></div><button class="btn-outline invite-friend" onclick="shareApp()">邀請朋友也抽一張牌</button>
   </div>
 
   <!-- ==================== 5. 紫微斗數（修正為獨立下拉選單＋精準排盤） ==================== -->
@@ -481,7 +482,7 @@
     <div class="header"><h1>七脈輪療癒卡</h1><p>靜下心，帶著此刻想探索的事抽一張牌。</p></div>
     <div class="card"><label for="chakra-filter">選擇脈輪</label><select class="form-select" id="chakra-filter"></select>
     <button class="btn-primary" onclick="drawChakra()">抽一張療癒卡</button></div>
-    <div id="chakra-reading" aria-live="polite"></div></div>
+    <div id="chakra-reading" aria-live="polite"></div><button class="btn-outline invite-friend" onclick="shareApp()">邀請朋友也抽一張牌</button></div>
   <div id="page-ziwei" class="page">
     <div class="header">
       <h1>紫微斗數 · 命宮探索</h1>
@@ -533,7 +534,7 @@
       <label for="star-kind">牌組</label><select class="form-select" id="star-kind"><option value="all">全部星曜</option><option value="1">十四主星單星</option><option value="2">雙星入十二宮</option></select>
       <label for="star-choice">查閱星曜解讀</label><select class="form-select" id="star-choice"></select>
       <button class="btn-outline" onclick="showStar()">查看這張牌</button><button class="btn-primary" onclick="drawStar()">隨機抽一張星曜牌</button>
-      <div id="star-reading" aria-live="polite"></div></section>
+      <div id="star-reading" aria-live="polite"></div><button class="btn-outline invite-friend" onclick="shareApp()">邀請朋友也抽一張牌</button></section>
   </div>
 
   <!-- ==================== 6. 八字命盤（同樣改為獨立下拉選單） ==================== -->
@@ -654,17 +655,18 @@
     }
   }
 
-  function shareApp() {
-    const url = 'https://liff.line.me/2012667731-poMXemgo';
+  async function shareApp() {
+    const url = 'https://sophie068-hub.github.io/Puxin-inner/';
     if (navigator.share) {
-      navigator.share({
-        title: '璞心｜Puxin Inner 線上心靈指引',
-        text: '來抽一張今日專屬你的心靈指引卡吧！',
-        url: url
-      });
-    } else {
-      alert('請複製此專屬連結分享給好友：\n' + url);
+      try {
+        await navigator.share({title: document.title, text: '邀請你來抽一張今日指引卡。', url});
+        return;
+      } catch (error) { if (error.name === 'AbortError') return; }
     }
+    try {
+      await navigator.clipboard.writeText(url);
+      alert('已複製心靈指引站網址，可以貼給好友。');
+    } catch { window.prompt('請複製網址分享給好友', url); }
   }
 
   // ==================== 十四主星白話解析庫 ====================
