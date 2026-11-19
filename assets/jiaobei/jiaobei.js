@@ -1,6 +1,7 @@
 /* 璞心線上擲筊：平／凸各以一個隨機位元模擬，不宣稱實體筊杯機率。 */
 (function (scope) {
   'use strict';
+  const scriptUrl = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : '';
 
   const readings = Object.freeze({
     yes: Object.freeze({ title: '聖筊', faces: '一個平面朝上，一個凸面朝上', meaning: '傳統解讀：同意、可以。', reflection: '此刻的你，有沒有一點安心？把這份感受收好，再想一個自己願意踏出的小步驟。' }),
@@ -24,6 +25,93 @@
     return Array.from(bytes, value => (value & 1) === 0 ? 'flat' : 'round');
   }
 
+  function createImpactAudio({ button, hint, src, isActive = () => true, env = scope }) {
+    if (!button || !hint) return { play() {}, stop() {} }; // 相容仍開著舊版頁面的訪客。
+    const Context = env.AudioContext || env.webkitAudioContext;
+    const storageKey = 'puxin-jiaobei-sound-muted';
+    const sources = new Set();
+    let enabled = true;
+    let generation = 0;
+    let context = null;
+    let decoded = null;
+    const clock = () => env.performance ? env.performance.now() : Date.now();
+    try { enabled = env.localStorage.getItem(storageKey) !== '1'; } catch (_) {}
+
+    function render() {
+      button.textContent = '落地音效：' + (enabled ? '開啟' : '靜音');
+      button.setAttribute('aria-pressed', String(enabled));
+      hint.textContent = enabled ? '擲筊時播放木筊落地聲' : '音效已靜音';
+    }
+    function stop() {
+      generation += 1;
+      for (const source of sources) {
+        try { source.stop(); } catch (_) {}
+      }
+      sources.clear();
+    }
+    if (!Context) {
+      button.disabled = true;
+      button.textContent = '落地音效：暫不支援';
+      button.setAttribute('aria-pressed', 'false');
+      hint.textContent = '仍可正常擲筊與抽卡';
+      return { play() {}, stop };
+    }
+
+    // 僅預載小型音檔；音訊裝置在使用者點擊後才啟用。
+    const sample = env.fetch(src).then(response => {
+      if (!response.ok) throw new Error('Audio unavailable');
+      return response.arrayBuffer();
+    }).catch(() => null);
+    render();
+    button.addEventListener('click', () => {
+      enabled = !enabled;
+      stop();
+      try { env.localStorage.setItem(storageKey, enabled ? '0' : '1'); } catch (_) {}
+      render();
+    });
+
+    function play(reducedMotion) {
+      stop();
+      if (!enabled || !isActive()) return;
+      const token = generation;
+      const started = clock();
+      try {
+        if (!context) context = new Context();
+        // resume 必須在這次點擊內直接呼叫，讓手機瀏覽器取得播放手勢。
+        const resumed = context.state === 'running' ? Promise.resolve() : context.resume();
+        if (!decoded) decoded = sample.then(bytes => bytes ? context.decodeAudioData(bytes.slice(0)) : null);
+        Promise.all([resumed, decoded]).then(([, buffer]) => {
+          if (token !== generation || !enabled || !isActive()) return;
+          if (!buffer || context.state !== 'running') {
+            hint.textContent = '目前無法播放音效，仍可繼續擲筊';
+            return;
+          }
+          const elapsed = (clock() - started) / 1000;
+          // 對齊左右筊杯第一次碰地（57%／62%）與較輕的回彈落定。
+          const hits = reducedMotion ? [[0.04, 0.4, 1]] : [[0.7695, 0.46, 1], [0.837, 0.38, 0.94], [1.26, 0.19, 1.08], [1.33, 0.13, 1.02]];
+          for (const [at, volume, rate] of hits) {
+            if (at < elapsed - 0.05) continue; // 載入太慢時不補播已錯過的碰地聲。
+            const source = context.createBufferSource();
+            const gain = context.createGain();
+            source.buffer = buffer;
+            source.playbackRate.value = rate;
+            gain.gain.value = volume;
+            source.connect(gain);
+            gain.connect(context.destination);
+            sources.add(source);
+            source.onended = () => { sources.delete(source); source.disconnect(); gain.disconnect(); };
+            source.start(context.currentTime + Math.max(0, at - elapsed));
+          }
+        }).catch(() => {
+          if (token === generation && enabled) hint.textContent = '目前無法播放音效，仍可繼續擲筊';
+        });
+      } catch (_) {
+        hint.textContent = '目前無法播放音效，仍可繼續擲筊';
+      }
+    }
+    return { play, stop };
+  }
+
   function mount(root) {
     if (!root || root.dataset.mounted === 'true') return;
     root.dataset.mounted = 'true';
@@ -36,6 +124,16 @@
     const result = get('result');
     const blocks = Array.from(root.querySelectorAll('.block'));
     const labels = [get('face-a'), get('face-b')];
+    const page = typeof root.closest === 'function' ? root.closest('.page') : null;
+    const sound = createImpactAudio({
+      button: get('sound-toggle'), hint: get('sound-hint'),
+      src: scriptUrl ? new URL('wood-impact-v1.wav', scriptUrl).href : 'wood-impact-v1.wav',
+      isActive: () => !document.hidden && (!page || page.classList.contains('active'))
+    });
+    if (typeof document.addEventListener === 'function') document.addEventListener('visibilitychange', () => { if (document.hidden) sound.stop(); });
+    if (page && scope.MutationObserver) new scope.MutationObserver(() => {
+      if (!page.classList.contains('active')) sound.stop();
+    }).observe(page, { attributes: true, attributeFilter: ['class'] });
     let busy = false;
     let hasResult = false;
     let generation = 0;
@@ -70,6 +168,7 @@
       cast.textContent = '筊杯翻動中…';
 
       const reducedMotion = scope.matchMedia && scope.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      sound.play(reducedMotion);
       await new Promise(resolve => scope.setTimeout(resolve, reducedMotion ? 120 : 1350));
       if (castGeneration !== generation) return;
       stage.classList.remove('is-tossing');
@@ -95,6 +194,7 @@
 
     function clearState(clearQuestion) {
       generation += 1;
+      sound.stop();
       busy = false;
       stage.classList.remove('is-tossing');
       hasResult = false;
@@ -123,7 +223,7 @@
     });
   }
 
-  const api = Object.freeze({ interpretFaces, castFaces, mount });
+  const api = Object.freeze({ interpretFaces, castFaces, mount, createImpactAudio });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else scope.PuxinJiaobei = api;
   if (typeof document !== 'undefined') mount(document.getElementById('puxin-jiaobei'));
