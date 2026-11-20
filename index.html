@@ -184,13 +184,15 @@
     /* 塔羅三張牌 */
     .tarot-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       margin: 18px 0;
     }
     .tarot-slot { text-align: center; }
     .tarot-pos { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
     .tarot-card {
+      width: 100%;
+      font: inherit;
       aspect-ratio: 2/3;
       background: var(--accent-dark);
       border: 1.5px solid var(--accent-gold);
@@ -209,8 +211,22 @@
       color: var(--text-primary);
       border: 1.5px solid var(--accent-gold);
     }
-    .tarot-card-num { font-size: 11px; color: var(--accent-gold); margin-bottom: 4px; }
-    .tarot-card-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .tarot-card.flipped { padding: 0; overflow: hidden; }
+    .tarot-card-art { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .tarot-card-action { display: block; margin: 4px auto 0; padding: 4px 0; border: 0; background: transparent; color: var(--text-primary); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; }
+    .tarot-detail {
+      box-sizing: border-box;
+      width: min(420px, calc(100% - 32px));
+      max-height: calc(100dvh - 32px);
+      overflow: auto;
+      padding: 20px;
+      border: 1px solid var(--accent-gold);
+      border-radius: 12px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+    .tarot-detail::backdrop { background: rgb(0 0 0 / 55%); }
+    .tarot-detail-close { margin-top: 16px; }
     .badge {
       display: inline-block;
       font-size: 11px;
@@ -444,10 +460,17 @@
       <button class="btn-primary" onclick="initTarot()">重新洗牌抽三張</button>
 
       <div class="tarot-grid" id="tarot-board"></div>
-      <div style="text-align: center; font-size: 12px; color: var(--text-secondary);">點擊上方牌背，依序翻開你的訊息</div>
+      <div style="text-align: center; font-size: 12px; color: var(--text-secondary);">點牌背翻牌，再選「查看牌卡詳情」。</div>
     </div>
 
-    <div id="tarot-readings"></div><button class="btn-outline invite-friend" onclick="shareApp()">邀請朋友也抽一張牌</button>
+    <dialog id="tarot-detail" class="tarot-detail" aria-labelledby="tarot-detail-title">
+      <h2 id="tarot-detail-title" class="result-title"></h2>
+      <p id="tarot-detail-text"></p>
+      <form method="dialog">
+        <button class="btn-outline tarot-detail-close" autofocus>返回三張牌</button>
+      </form>
+    </dialog>
+    <button class="btn-outline invite-friend" onclick="shareApp()">邀請朋友也抽一張牌</button>
   </div>
 
   <!-- ==================== 3. 慈悲靈性指引卡 ==================== -->
@@ -909,31 +932,9 @@
   }
 
   // ==================== 塔羅三張牌 ====================
-  const tarotDeck = [
-    { num: '0', name: '愚者', up: '新的開始、信任直覺、勇敢踏出舒適圈。', rev: '猶豫不決、過度衝動、需要先看清腳下的路。' },
-    { num: 'I', name: '魔術師', up: '資源齊備、創造力爆發、把想法化為現實。', rev: '缺乏專注、自我懷疑、別讓恐懼限制了你的天賦。' },
-    { num: 'II', name: '女祭司', up: '傾聽內在聲音、靜心觀察、答案早已在你心中。', rev: '過度理智、忽略直覺、給自己一點獨處靜心的時間。' },
-    { num: 'III', name: '皇后', up: '豐盛滋養、溫柔接納、愛自己就會吸引美好。', rev: '過度付出、忽略自我照顧、先填滿自己的愛之杯。' },
-    { num: 'IV', name: '皇帝', up: '建立秩序、穩定掌控、用行動展現你的力量。', rev: '過度控制、僵化固執、試著放手讓事情自然流動。' },
-    { num: 'V', name: '教皇', up: '尋求智慧指引、傳統與傳承、適合學習與進修。', rev: '打破框架、傾聽內心真實信仰、不盲從他人標準。' },
-    { num: 'VI', name: '戀人', up: '真誠連結、重要選擇、跟隨內心熱愛的方向。', rev: '關係失衡、逃避選擇、先與自己的內在達成和解。' },
-    { num: 'VII', name: '戰車', up: '意志堅定、突破障礙、朝著目標全速前進。', rev: '方向混亂、情緒拉扯、先停下來校準內在羅盤。' },
-    { num: 'VIII', name: '力量', up: '以柔克剛、內在勇氣、用慈悲與耐心馴服恐懼。', rev: '自我批判、能量耗竭、允許自己偶爾感到脆弱。' },
-    { num: 'IX', name: '隱者', up: '內省沉澱、獨處智慧、向內尋找真正的光。', rev: '過度孤立、逃避人群、是時候把你的光分享出來了。' },
-    { num: 'X', name: '命運之輪', up: '轉機到來、順應循環、好運正在向你靠近。', rev: '暫時停滯、抗拒改變、相信一切安排都是最好的轉折。' },
-    { num: 'XI', name: '正義', up: '因果平衡、客觀清晰、為自己的選擇負起責任。', rev: '失衡委屈、逃避真相、誠實面對內心的真實感受。' },
-    { num: 'XII', name: '倒吊人', up: '換位思考、靜待時機、放下執著反而看見新視角。', rev: '無謂犧牲、陷入僵局、別再為不值得的事消耗自己。' },
-    { num: 'XIII', name: '死神', up: '結束與重生、勇敢告別舊模式、迎接全新篇章。', rev: '害怕改變、緊抓過去、唯有放手才能騰出空間接納新事物。' },
-    { num: 'XIV', name: '節制', up: '和諧流動、身心平衡、耐心整合不同的能量。', rev: '情緒失調、急躁失衡、放慢腳步找回生活節奏。' },
-    { num: 'XV', name: '惡魔', up: '覺察執念、看見內在渴望、你有能力解開束縛。', rev: '掙脫枷鎖、重獲自由、看清幻象並拿回人生主導權。' },
-    { num: 'XVI', name: '高塔', up: '瞬間覺醒、舊結構瓦解、真相大白後的重建。', rev: '抗拒劇變、壓抑情緒、提前釋放壓力能減少衝擊。' },
-    { num: 'XVII', name: '星星', up: '希望與療癒、宇宙祝福、保持信念光亮就在前方。', rev: '信心動搖、感到疲憊、重新連結內在的靈感與希望。' },
-    { num: 'XVIII', name: '月亮', up: '潛意識浮現、敏銳直覺、穿越迷霧看見真實。', rev: '恐懼消散、逐漸明朗、別被腦海中的擔憂嚇倒了。' },
-    { num: 'XIX', name: '太陽', up: '喜悅豐盛、充滿活力、清晰與成功正在照耀你。', rev: '短暫陰霾、過度樂觀、太陽只是被雲遮住很快會放晴。' },
-    { num: 'XX', name: '審判', up: '靈魂召喚、覺醒蛻變、過去的努力將迎來回報。', rev: '自我懷疑、忽略召喚、原諒過去的自己才能大步向前。' },
-    { num: 'XXI', name: '世界', up: '圓滿達成、整合昇華、一個美好循環的完成。', rev: '差臨門一腳、未竟之事、把最後的細節收尾就能圓滿。' }
-  ];
+  const tarotDeck = [{"id": "T00", "num": "0", "name": "愚者", "up": "新的開始、信任直覺、勇敢踏出舒適圈。宇宙正為你敞開一扇全新的門，帶著赤子之心輕裝出發，每一步都是風景。", "rev": "猶豫不決、過度衝動、需要先看清腳下的路。停下腳步校準內心，區分「靈魂的渴望」與「逃避現實的衝動」。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1yvfq1_V27uDPhMrb2ZHk6O_wO0pDUhYI"}, {"id": "T01", "num": "I", "name": "魔術師", "up": "資源齊備、創造力爆發、把想法化為現實。你已經擁有完成這件事所需的一切天賦與工具，現在正是專注聚焦、大膽創造的時刻。", "rev": "缺乏專注、自我懷疑、別讓恐懼限制了你的天賦。把分散在各處的精力收回來，先專心完成眼前最重要的一件事。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=172fWxB2bqbhhIyUgFVL7RNTADycuyQYE"}, {"id": "T02", "num": "II", "name": "女祭司", "up": "傾聽內在聲音、靜心觀察、答案早已在你心中。外界越是喧囂，越需要回到安靜的內在聖殿，答案會在沉澱後自然浮現。", "rev": "過度理智、忽略直覺、給自己一點獨處靜心的時間。別只用大腦分析利弊，試著把手放在心口，聽聽身體最真實的感受。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1V4Q1aWHqaPs74xSzqC9qid3A2OmDxeo0"}, {"id": "T03", "num": "III", "name": "皇后", "up": "豐盛滋養、溫柔接納、愛自己就會吸引美好。允許自己被生活溫柔對待，當你把自己照顧得飽滿芬芳，美好與豐盛自然向你靠近。", "rev": "過度付出、忽略自我照顧、先填滿自己的愛之杯。你不需要透過無止境地照顧別人來證明價值，先好好疼愛現在的自己。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1JK8O_-jJjSvwPMlXQBzhB4sjKd5NERB4"}, {"id": "T04", "num": "IV", "name": "皇帝", "up": "建立秩序、穩定掌控、用行動展現你的力量。為生活建立清晰的結構與原則，當你穩住自己的中心，就能成為自己與他人的堅實靠山。", "rev": "過度控制、僵化固執、試著放手讓事情自然流動。真正的力量不是把所有細節抓在手裡，而是相信即使有變化，你依然能從容應對。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1URkV1oHejlKtUB5mQibzqAW_6q5r-6L1"}, {"id": "T05", "num": "V", "name": "教皇", "up": "尋求智慧指引、傳統與傳承、適合學習與進修。透過系統化的學習或向有經驗的導師請益，能幫你梳理盲點，建立更紮實的內在根基。", "rev": "打破框架、傾聽內心真實信仰、不盲從他人標準。檢視那些「別人說應該這樣」的舊規則，留下真正滋養你的，放下不再適用的。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=10dqVpjoW30lEUIJyE9mDrhmcOpk2SjUP"}, {"id": "T06", "num": "VI", "name": "戀人", "up": "真誠連結、重要選擇、跟隨內心熱愛的方向。無論是關係或人生抉擇，當你的頭腦與心意達成一致，所做的決定都會帶來深層的喜悅。", "rev": "關係失衡、逃避選擇、先與自己的內在達成和解。在向外尋求認同或配合他人之前，先問問自己：這是不是我真正想要的？", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1CEq8Ju_0QKWINVFdX7HsR_Ua6ThNxqrG"}, {"id": "T07", "num": "VII", "name": "戰車", "up": "意志堅定、突破障礙、朝著目標全速前進。把內在對立的想法整合為同一股前進的動力，只要方向清晰，你就能跨越眼前的阻礙。", "rev": "方向混亂、情緒拉扯、先停下來校準內在羅盤。當理智與情緒互相拉扯時，硬踩油門只會消耗能量，先停車深呼吸再重新出發。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1VZ7py_WZRgKB24KkqrY9DJ3jNnf4GIia"}, {"id": "T08", "num": "VIII", "name": "力量", "up": "以柔克剛、內在勇氣、用慈悲與耐心馴服恐懼。真正的強大不是壓抑情緒，而是溫柔地抱住內在不安的野獸，用理解與愛化解焦慮。", "rev": "自我批判、能量耗竭、允許自己偶爾感到脆弱。放下對自己的苛責，疲憊的時候就允許自己休息，溫柔對待自己才是恢復力量的開始。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1WVQI3EVdj9g2bZTDouG1d-i32FaytlkO"}, {"id": "T09", "num": "IX", "name": "隱者", "up": "內省沉澱、獨處智慧、向內尋找真正的光。暫時從忙碌的社交與外在期待中退一步，在安靜獨處的時光裡，你會聽見靈魂最清晰的指引。", "rev": "過度孤立、逃避人群、是時候把你的光分享出來了。獨處是為了充電而不是自我封閉，試著向信任的人敞開一點心扉，讓溫暖流進來。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1lcQQgWSzUdkAqcRQBtJFYy5dO8nK3sPu"}, {"id": "T10", "num": "X", "name": "命運之輪", "up": "轉機到來、順應循環、好運正在向你靠近。生命的巨輪正在轉動，保持敞開與彈性，接住宇宙為你帶來的意外驚喜與新契機。", "rev": "暫時停滯、抗拒改變、相信一切安排都是最好的轉折。當事情不如預期時，試著停止與現狀對抗，看看這個停頓正想教會你什麼？", "image": "https://drive.google.com/thumbnail?sz=w1024&id=10qXAwYu4YrmAVbeRx3MPw51yQcTylRil"}, {"id": "T11", "num": "XI", "name": "正義", "up": "因果平衡、客觀清晰、為自己的選擇負起責任。用清澈不帶情緒的眼光看清事實全貌，做出公正且對得起自己內心的決定。", "rev": "失衡委屈、逃避真相、誠實面對內心的真實感受。問問自己是不是在關係或工作中付出了太多卻不敢說，重新找回給予與接受的平衡。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1Sh4oHRmCmQOgxlMzU10YXQMwy6Y7MgGc"}, {"id": "T12", "num": "XII", "name": "倒吊人", "up": "換位思考、靜待時機、放下執著反而看見新視角。當事情暫時無法推進時，換個角度看待眼前的限制，你會發現這段等待正在醞釀更深的智慧。", "rev": "無謂犧牲、陷入僵局、別再為不值得的事消耗自己。停止扮演委屈的拯救者，把力氣收回來照顧自己，放手才是解開僵局的鑰匙。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1psTuHet2dcS-ARpmMgs6VZ3iXS-CGj7K"}, {"id": "T13", "num": "XIII", "name": "死神", "up": "結束與重生、勇敢告別舊模式、迎接全新篇章。允許已經完成階段性任務的人事物自然落幕，騰出內心的空間，新的生命力才能進駐。", "rev": "害怕改變、緊抓過去、唯有放手才能騰出空間接納新事物。溫柔地向過去道謝並道別，你不是失去了什麼，而是正在蛻變成更自由的自己。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1Z90V-YYVTbEblMxpnXtcTwZgtsiZ641U"}, {"id": "T14", "num": "XIV", "name": "節制", "up": "和諧流動、身心平衡、耐心整合不同的能量。不需要急著非黑即白，用溫和、漸進的步調調和工作與生活、理智與情感，一切正趨向圓融。", "rev": "情緒失調、急躁失衡、放慢腳步找回生活節奏。留意自己是不是太急著看到結果，喝杯溫水、調整呼吸，讓身心重新回到和諧的頻率。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1QrB5LJGSPn_HIPUS5KyQcy8Eka-0QL7m"}, {"id": "T15", "num": "XV", "name": "惡魔", "up": "覺察執念、看見內在渴望、你有能力解開束縛。看清那些讓你感到焦慮、成癮或委屈的關係與信念，記住：鎖鏈一直都是鬆的，你隨時可以走出來。", "rev": "掙脫枷鎖、重獲自由、看清幻象並拿回人生主導權。你正在從某個限制性信念或過度依賴中醒來，勇敢做出讓自己真正自由的選擇。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1UvJ3TTbcnl6i7XjrckqmkO7EG5Gaz73C"}, {"id": "T16", "num": "XVI", "name": "高塔", "up": "瞬間覺醒、舊結構瓦解、真相大白後的重建。突如其來的變化雖然令人震驚，但它正在幫你震碎原本就不穩固的假象，讓你能在真實之上重建家園。", "rev": "抗拒劇變、壓抑情緒、提前釋放壓力能減少衝擊。與其緊抓著搖搖欲墜的舊模式不放，不如主動調整步伐，允許自己在安全中釋放累積已久的壓力。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1zz3Gu1IunN3FmH2Kgnkmmiym1G4qJUTd"}, {"id": "T17", "num": "XVII", "name": "星星", "up": "希望與療癒、宇宙祝福、保持信念光亮就在前方。經歷過風雨之後，溫柔的療癒之水正在滋潤你的心田，卸下防備，相信自己值得被宇宙深深祝福。", "rev": "信心動搖、感到疲憊、重新連結內在的靈感與希望。允許自己暫時沒有力氣發光也沒關係，抬頭看看夜空，你本身就是一顆正在休養生息的星星。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1aDCF_hoefEOUoGGrWNGsASywhBMnxpKW"}, {"id": "T18", "num": "XVIII", "name": "月亮", "up": "潛意識浮現、敏銳直覺、穿越迷霧看見真實。內在的不安與多夢只是潛意識正在清理舊情緒，不需要急著驅趕黑夜，陪伴自己的敏感，黎明很快就會到來。", "rev": "恐懼消散、逐漸明朗、別被腦海中的擔憂嚇倒了。分清楚哪些是「真實發生的事」，哪些是「大腦想像出來的恐懼」，迷霧正在慢慢散去。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1PV2kgrmQmTskpp7v-VXETl10CK8jerB4"}, {"id": "T19", "num": "XIX", "name": "太陽", "up": "喜悅豐盛、充滿活力、清晰與成功正在照耀你。像孩子在陽光下盡情奔跑一樣，大方展現你的熱情與才華，你的真誠會為你帶來滿滿的溫暖與好運。", "rev": "短暫陰霾、過度樂觀、太陽只是被雲遮住很快會放晴。如果覺得活力有點低落，別勉強自己隨時保持正能量，休息一下，雲散之後陽光依然燦爛。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1MkrRw6XMBnPoPC2teipGIICrio5EZGFT"}, {"id": "T20", "num": "XX", "name": "審判", "up": "靈魂召喚、覺醒蛻變、過去的努力將迎來回報。你正站在人生升級的門檻上，過去所有的累積與經歷都將在這一刻匯聚成力量，喚醒你更真實的生命使命。", "rev": "自我懷疑、忽略召喚、原諒過去的自己才能大步向前。別再用過去的失誤來懲罰現在的自己，聽見內心深處那個渴望成長的聲音，勇敢回應它。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=12u68NybOLZ6rpq2KHhgSFBcVMTGjcLmX"}, {"id": "T21", "num": "XXI", "name": "世界", "up": "圓滿達成、整合昇華、一個美好循環的完成。恭喜你走過了一段豐富的旅程，好好肯定自己的付出與成長，帶著這份圓滿的智慧，準備邁向更高的舞台。", "rev": "差臨門一腳、未竟之事、把最後的細節收尾就能圓滿。檢視手邊還差一點點就完成的事情，給自己一點耐心把最後一塊拼圖放上去，就能安心慶祝成果。", "image": "https://drive.google.com/thumbnail?sz=w1024&id=1UJluh3aBMsX9ZPmsfYz8IdHxFCo8ZdOW"}];
 
+  const tarotPositions = ['過去', '現在', '未來'];
   let drawnTarot = [];
   function initTarot() {
     const shuffled = [...tarotDeck].sort(() => 0.5 - Math.random());
@@ -942,43 +943,45 @@
       isReversed: Math.random() < 0.4,
       flipped: false
     }));
-    const positions = ['過去', '現在', '未來'];
-    document.getElementById('tarot-board').innerHTML = drawnTarot.map((c, idx) => `
+    document.getElementById('tarot-board').innerHTML = drawnTarot.map((_, index) => `
       <div class="tarot-slot">
-        <div class="tarot-pos">${positions[idx]}</div>
-        <div class="tarot-card" id="tcard-${idx}" onclick="flipTarot(${idx})">
-          <div style="font-size: 20px;">✦</div>
-          <div style="font-size: 11px; margin-top: 6px;">點擊翻牌</div>
-        </div>
+        <div class="tarot-pos">${tarotPositions[index]}</div>
+        <button type="button" class="tarot-card" id="tcard-${index}" onclick="flipTarot(${index})"
+          aria-label="翻開牌卡，${tarotPositions[index]}">
+          <span style="font-size: 20px;" aria-hidden="true">✦</span>
+          <span style="font-size: 11px; margin-top: 6px;">點擊翻牌</span>
+        </button>
+        <div id="tarot-caption-${index}"></div>
       </div>
     `).join('');
-    document.getElementById('tarot-readings').innerHTML = '';
   }
 
-  function flipTarot(idx) {
-    if (drawnTarot[idx].flipped) return;
-    drawnTarot[idx].flipped = true;
-    const c = drawnTarot[idx];
-    const el = document.getElementById('tcard-' + idx);
-    el.classList.add('flipped');
-    el.innerHTML = `
-      <div class="tarot-card-num">${c.num}</div>
-      <div class="tarot-card-name">${c.name}</div>
-      <span class="badge ${c.isReversed ? 'reversed' : 'upright'}">${c.isReversed ? '逆位' : '正位'}</span>
+  function flipTarot(index) {
+    const card = drawnTarot[index];
+    const orientation = card.isReversed ? '逆位' : '正位';
+    const title = `${tarotPositions[index]}｜${card.name}（${orientation}）`;
+    if (card.flipped) {
+      document.getElementById('tarot-detail-title').textContent = title;
+      document.getElementById('tarot-detail-text').textContent = card.isReversed ? card.rev : card.up;
+      document.getElementById('tarot-detail').showModal();
+      return;
+    }
+
+    card.flipped = true;
+    const button = document.getElementById('tcard-' + index);
+    button.classList.add('flipped');
+    button.setAttribute('aria-label', '查看牌卡詳情，' + title);
+    button.setAttribute('aria-haspopup', 'dialog');
+    button.innerHTML = `
+      <span>${card.name}</span>
+      <img class="tarot-card-art" src="${card.image}" alt="" width="1024" height="1536"
+        onload="this.previousElementSibling.hidden = true"
+        onerror="this.remove()">
     `;
-    const positions = ['過去 · 根源', '現在 · 處境', '未來 · 趨勢'];
-    let html = '';
-    drawnTarot.forEach((item, i) => {
-      if (item.flipped) {
-        html += `
-          <div class="result-box">
-            <div class="result-title">${positions[i]}：${item.name}（${item.isReversed ? '逆位' : '正位'}）</div>
-            <div style="font-size: 14px; color: var(--text-primary);">${item.isReversed ? item.rev : item.up}</div>
-          </div>
-        `;
-      }
-    });
-    document.getElementById('tarot-readings').innerHTML = html;
+    document.getElementById('tarot-caption-' + index).innerHTML = `
+      <span class="badge ${card.isReversed ? 'reversed' : 'upright'}">${orientation}</span>
+      <button type="button" class="tarot-card-action" aria-haspopup="dialog" onclick="flipTarot(${index})">查看牌卡詳情</button>
+    `;
   }
 
   // 完整觀音神諭與內在小孩牌組：已核對的文案、圖卡及欄位。
