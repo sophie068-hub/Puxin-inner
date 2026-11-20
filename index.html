@@ -227,6 +227,7 @@
     .tarot-zoom::backdrop { background: rgb(0 0 0 / 65%); }
     .tarot-zoom img { display: block; max-width: 100%; max-height: 65dvh; margin: 0 auto 12px; object-fit: contain; }
 
+    .tarot-art-reversed { transform: rotate(180deg); }
     .tarot-reading-text { margin: 0; line-height: 1.7; }
     .badge {
       display: inline-block;
@@ -944,8 +945,10 @@
       artwork.alt = '';
       artwork.width = 320;
       artwork.height = 480;
+      const isReversed = Math.random() < 0.4;
+      artwork.classList.toggle('tarot-art-reversed', isReversed);
       artwork.src = card.image;
-      return { ...card, artwork, isReversed: Math.random() < 0.4, flipped: false };
+      return { ...card, artwork, isReversed, flipped: false };
     });
     document.getElementById('tarot-readings').replaceChildren();
     document.getElementById('tarot-board').innerHTML = drawnTarot.map((_, index) => `
@@ -967,7 +970,9 @@
     const title = card.name + '（' + orientation + '）';
     if (card.flipped) {
       document.getElementById('tarot-zoom-title').textContent = title;
-      document.getElementById('tarot-zoom-image').src = card.artwork.src;
+      const zoomImage = document.getElementById('tarot-zoom-image');
+      zoomImage.classList.toggle('tarot-art-reversed', card.isReversed);
+      zoomImage.src = card.artwork.src;
       document.getElementById('tarot-zoom').showModal();
       return;
     }
