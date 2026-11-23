@@ -293,17 +293,16 @@
       cursor: pointer;
     }
     .oracle-symbol {
+      display: block;
       width: 56px;
       height: 56px;
-      border-radius: 50%;
+      object-fit: cover;
       border: 1px solid var(--accent-gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border-radius: 4px;
       margin: 0 auto 14px;
-      font-size: 22px;
-      color: var(--accent-gold);
-      background: var(--bg-main);
+    }
+    #page-child .oracle-symbol {
+      border-color: var(--accent-rose);
     }
     .result-box {
       background: var(--bg-card);
@@ -546,7 +545,7 @@
   <div id="page-guanyin" class="page" data-deck-total="32">
     <div class="header"><h1 class="section-heading"><span>觀音神諭卡</span><img class="section-icon" src="section-guanyin-illustrated.jpg" width="60" height="60" alt=""></h1><p>32 張慈悲指引 · 靜下心，領取此刻的提醒</p></div>
     <button type="button" class="oracle-deck" onclick="drawGuanyin()">
-      <span class="oracle-symbol">蓮</span>
+      <img class="oracle-symbol" src="section-guanyin-illustrated.jpg" width="56" height="56" alt="">
       <span style="display:block;font-size:16px;font-weight:600">抽一張觀音神諭卡</span>
       <span style="display:block;font-size:12.5px;color:var(--text-secondary);margin-top:6px">讀取完整慈悲指引、行動建議與靜心祈願語</span>
     </button>
@@ -624,7 +623,7 @@
     <div class="header"><h1 class="section-heading"><span>內在小孩療癒卡</span><img class="section-icon" src="section-child-illustrated.jpg" width="60" height="60" alt=""></h1><p>44 張陪伴卡 · 聽見感受，練習照顧自己</p></div>
     <div class="card"><label class="form-label" for="child-group">選擇陪伴牌組</label><select class="form-select" id="child-group" onchange="updateChildDeckGroup()"><option value="">全部四組</option><option value="看見情緒">看見情緒</option><option value="聽見需要">聽見需要</option><option value="探索信念">探索信念</option><option value="練習照顧自己">練習照顧自己</option></select><p class="deck-count" id="child-deck-count">目前牌組共 44 張</p></div>
     <button type="button" class="oracle-deck" style="border-color:var(--accent-rose)" onclick="drawInnerChild()">
-      <span class="oracle-symbol" style="border-color:var(--accent-rose);color:var(--accent-rose)">心</span>
+      <img class="oracle-symbol" src="section-child-illustrated.jpg" width="56" height="56" alt="">
       <span style="display:block;font-size:16px;font-weight:600">抽一張內在小孩陪伴卡</span>
       <span style="display:block;font-size:12.5px;color:var(--text-secondary);margin-top:6px">練習可睜眼進行，也可以跳過或停下。</span>
     </button>
