@@ -51,6 +51,45 @@
       letter-spacing: 1px;
       color: var(--text-primary);
     }
+    .section-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 1.65em;
+      height: 1.65em;
+      margin-inline-start: .45em;
+      border: 1px solid var(--accent-gold);
+      border-radius: 50%;
+      background: var(--bg-sub);
+      color: var(--accent-dark);
+      font-size: .76em;
+      letter-spacing: 0;
+      line-height: 1;
+      vertical-align: .08em;
+    }
+
+    .brand-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      flex: none;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+    .card-usage {
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 13px;
+      text-align: center;
+    }
+    .card-usage a {
+      color: inherit;
+      text-underline-offset: 2px;
+    }
+
     .header p {
       font-size: 13px;
       color: var(--text-secondary);
@@ -396,7 +435,10 @@
   <!-- ==================== 1. 首頁大廳 ==================== -->
   <div id="page-home" class="page active">
     <div class="header">
-      <h1>「璞心｜Puxin Inner」心靈指引站</h1>
+      <h1 class="brand-heading">
+        <img class="brand-logo" src="puxin-logo.png" width="56" height="56" alt="璞心學苑徽章">
+        <span>「璞心｜Puxin Inner」心靈指引站</span>
+      </h1>
       <p>紫微 · 八字 · 七脈輪 · 慈悲神諭 · 內在小孩 · 塔羅</p>
     </div>
 
@@ -468,7 +510,7 @@
   <!-- ==================== 2. 塔羅三張牌 ==================== -->
   <div id="page-tarot" class="page">
     <div class="header">
-      <h1>塔羅三張牌</h1>
+      <h1>塔羅三張牌<span class="section-icon" aria-hidden="true">🃏</span></h1>
       <p>TAROT · 過去 · 現在 · 未來</p>
     </div>
 
@@ -498,7 +540,7 @@
 
   <!-- ==================== 3. 慈悲靈性指引卡 ==================== -->
   <div id="page-guanyin" class="page" data-deck-total="32">
-    <div class="header"><h1>觀音神諭卡</h1><p>32 張慈悲指引 · 靜下心，領取此刻的提醒</p></div>
+    <div class="header"><h1>觀音神諭卡<span class="section-icon" aria-hidden="true">🪷</span></h1><p>32 張慈悲指引 · 靜下心，領取此刻的提醒</p></div>
     <button type="button" class="oracle-deck" onclick="drawGuanyin()">
       <span class="oracle-symbol">蓮</span>
       <span style="display:block;font-size:16px;font-weight:600">抽一張觀音神諭卡</span>
@@ -575,7 +617,7 @@
 
   <!-- ==================== 4. 內在小孩療癒卡 ==================== -->
   <div id="page-child" class="page" data-deck-total="44">
-    <div class="header"><h1>內在小孩療癒卡</h1><p>44 張陪伴卡 · 聽見感受，練習照顧自己</p></div>
+    <div class="header"><h1>內在小孩療癒卡<span class="section-icon" aria-hidden="true">🧸</span></h1><p>44 張陪伴卡 · 聽見感受，練習照顧自己</p></div>
     <div class="card"><label class="form-label" for="child-group">選擇陪伴牌組</label><select class="form-select" id="child-group" onchange="updateChildDeckGroup()"><option value="">全部四組</option><option value="看見情緒">看見情緒</option><option value="聽見需要">聽見需要</option><option value="探索信念">探索信念</option><option value="練習照顧自己">練習照顧自己</option></select><p class="deck-count" id="child-deck-count">目前牌組共 44 張</p></div>
     <button type="button" class="oracle-deck" style="border-color:var(--accent-rose)" onclick="drawInnerChild()">
       <span class="oracle-symbol" style="border-color:var(--accent-rose);color:var(--accent-rose)">心</span>
@@ -591,7 +633,7 @@
 
   <!-- ==================== 5. 紫微斗數（修正為獨立下拉選單＋精準排盤） ==================== -->
   <div id="page-chakra" class="page">
-    <div class="header"><h1>七脈輪療癒卡</h1><p>靜下心，帶著此刻想探索的事抽一張牌。</p></div>
+    <div class="header"><h1>七脈輪療癒卡<span class="section-icon" aria-hidden="true">🌈</span></h1><p>靜下心，帶著此刻想探索的事抽一張牌。</p></div>
     <div class="card"><label for="chakra-filter">選擇脈輪</label><select class="form-select" id="chakra-filter"></select>
     <button class="btn-primary" onclick="drawChakra()">抽一張療癒卡</button></div>
     <div id="chakra-reading" aria-live="polite"></div><button class="btn-outline invite-friend" onclick="shareApp()">邀請朋友也抽一張牌</button>
@@ -602,7 +644,7 @@
   </div>
   <div id="page-ziwei" class="page">
     <div class="header">
-      <h1>紫微斗數 · 命宮探索</h1>
+      <h1>紫微斗數 · 命宮探索<span class="section-icon" aria-hidden="true">✦</span></h1>
       <p>先排本命十二宮，再查閱命宮人格圖卡。也可以在下方獨立查牌。</p>
     </div>
 
@@ -663,7 +705,7 @@
   <!-- ==================== 6. 八字命盤（同樣改為獨立下拉選單） ==================== -->
   <div id="page-bazi" class="page">
     <div class="header">
-      <h1>八字五行 · 四柱能量</h1>
+      <h1>八字五行 · 四柱能量<span class="section-icon" aria-hidden="true">☯</span></h1>
       <p>排出四柱八字與本命日主五行調頻建議</p>
     </div>
 
@@ -706,6 +748,10 @@
     </div>
   </div>
 
+  <footer class="card-usage">
+    <p>本系統牌卡圖像為個人使用 AI 生成的創作。</p>
+    <p>如需轉載或延伸使用，請洽<a href="https://lin.ee/q1uvACj" target="_blank" rel="noopener noreferrer">璞心官方 LINE</a>。</p>
+  </footer>
 </div>
 
 <!-- 底部固定導覽列 -->
