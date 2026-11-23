@@ -430,6 +430,35 @@
 <style>.deck-entry{width:100%;font:inherit;color:inherit;text-align:left}.deck-entry .menu-desc{display:block}.card h2{font-size:1.2rem}.card label{display:block;margin:.75rem 0 .3rem}.deck-art{display:block;width:min(100%,350px);margin:0 auto 18px;border-radius:12px}.reading dt{font-weight:650;margin-top:14px}.reading dd{margin:4px 0;white-space:pre-line}.nav-item{min-width:0;flex:1}.nav-item:focus-visible,.menu-item:focus-visible{outline:2px solid #775b46}</style><style>div:empty + .invite-friend{display:none}</style>
 <style>.oracle-deck{width:100%;font:inherit;color:inherit}.oracle-deck:focus-visible{outline:3px solid #775b46;outline-offset:3px}.companion-art-link{display:block;margin:0 auto 18px;max-width:350px}.companion-art{height:auto;object-fit:contain;margin-bottom:0}.companion-copy{font-size:14.5px;line-height:1.85}.companion-copy dd{margin:5px 0 16px;overflow-wrap:anywhere}.deck-count{font-size:13px;color:var(--text-secondary);margin:8px 0 0}.companion-reading>.btn-outline{margin-top:18px;width:100%}.companion-image-note{font-size:14px;line-height:1.7;color:var(--text-secondary)}</style>
   <link rel="stylesheet" href="assets/jiaobei/jiaobei.css?v=20261119-audio1">
+<style>
+    :root {
+      --bg-main: #e4f7f4;
+      --bg-card: #fbfffe;
+      --bg-sub: #d6f2ed;
+      --text-primary: #203d3d;
+      --text-secondary: #426360;
+      --border-color: #b8ded7;
+      --accent-dark: #235653;
+      --accent-gold: #846436;
+    }
+    html { background-color: #e4f7f4; }
+    body { isolation: isolate; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 102% 51% at -17% 9%, transparent 43%, #e2faf570 45%, #fff9e37a 47%, #e4c88b68 49%, #f5e4bf85 53%, #fffdf294 58%, #8bd8cf60 63%, transparent 71%),
+        radial-gradient(ellipse 110% 39% at 113% 82%, transparent 43%, #d3f7ef78 46%, #fff9e67d 49%, #e6cb946c 52%, #f7e7c280 56%, #fff9ec8c 61%, #78cfc560 66%, transparent 75%),
+        linear-gradient(146deg, #9ce1d7, #f4fffc 44%, #ddf6f1 68%, #84d4cb);
+    }
+    .oracle-deck { background: linear-gradient(145deg, #fbfffe, #e1f7f2); }
+    .cta-box { background: #e4f7f4; }
+    .palace-cell.ming { background: #e4f7f4; }
+    .bottom-nav { background: #f2fcfa; }
+  </style>
 </head>
 <body>
 
@@ -445,7 +474,7 @@
       <p>紫微 · 八字 · 七脈輪 · 慈悲神諭 · 內在小孩 · 塔羅</p>
     </div>
 
-    <div class="card" style="background: var(--bg-sub); border: none;">
+    <div class="card" style="background: var(--bg-sub); border: 1px solid var(--accent-gold);">
       <div style="font-size: 13px; color: var(--text-secondary);">今日靜心提醒</div>
       <div style="font-size: 15px; font-weight: 500; margin-top: 4px;">
         「深呼吸三次，在心裡默念你的問題，選擇一種與你最有共鳴的指引方式。」
