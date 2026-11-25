@@ -13,6 +13,10 @@
     });
   </script>
   <meta charset="UTF-8">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="puxin-logo.png">
+  <meta name="apple-mobile-web-app-title" content="璞心">
+  <script defer src="assets/install.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="puxin-deck-version" content="20261119-inner44-guanyin32">
   <title>「璞心｜Puxin Inner」心靈指引站</title>
@@ -469,6 +473,18 @@
     .cta-box { background: #e4f7f4; }
     .palace-cell.ming { background: #e4f7f4; }
     .bottom-nav { background: #f2fcfa; }
+    .install-button {
+      min-height: 44px;
+      margin-top: 12px;
+      padding: 6px 16px;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-primary);
+      font: inherit;
+      cursor: pointer;
+    }
+    .install-help { margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -483,6 +499,8 @@
         <span class="brand-title">「璞心｜Puxin Inner」<br>心靈指引站</span>
       </h1>
       <p>紫微 · 八字 · 七脈輪 · 慈悲神諭 · 內在小孩 · 塔羅</p>
+      <button class="install-button" id="install-button" type="button" aria-expanded="false" aria-controls="install-help" hidden>點我加到桌面</button>
+      <p class="install-help" id="install-help" role="status" hidden></p>
     </div>
 
     <div class="card" style="background: var(--bg-sub); border: 1px solid var(--accent-gold);">
